@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuizMaster - Pattao National High School</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(180deg, #fff7ed, #ffffff);
+}
+</style>
+</head>
+
+<body class="p-6">
+
+<div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+
+<h1 class="text-3xl font-bold text-center text-red-800 mb-2">
+QuizMaster
+</h1>
+<p class="text-center text-gray-600 mb-6">
+Pattao National High School
+</p>
+
+<!-- TEACHER & STUDENT INFO -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <input id="teacher" type="text" placeholder="Teacher Name" class="border p-2 rounded">
+    <input id="subject" type="text" placeholder="Subject" class="border p-2 rounded">
+    <input id="student" type="text" placeholder="Student Name" class="border p-2 rounded">
+</div>
+
+<hr class="mb-6">
+
+<!-- QUIZ QUESTIONS -->
+<form id="quizForm" class="space-y-6"></form>
+
+<button onclick="submitQuiz()" class="w-full bg-red-800 text-white py-3 rounded hover:bg-red-900">
+Submit Quiz
+</button>
+
+<!-- RESULT -->
+<div id="result" class="hidden mt-6 p-4 bg-gray-100 rounded"></div>
+
+<footer class="text-center mt-6 text-gray-500 text-sm">
+©2025 Relnaldo P. Usigan, Mylene A. Baquiran, John Joseph Agorilla
+</footer>
+
+</div>
+
+<script>
+const questions = [
+{q:"Who was the first President of the United States?", options:["Thomas Jefferson","George Washington","Abraham Lincoln","John Adams"], answer:1},
+{q:"The Great Wall of China was primarily built to protect against which group?", options:["Mongols","Japanese","Koreans","Russians"], answer:0},
+{q:"Which event started World War I?", options:["Bombing of Pearl Harbor","Assassination of Archduke Franz Ferdinand","Invasion of Poland","Fall of the Berlin Wall"], answer:1},
+{q:"Who wrote the 95 Theses, starting the Protestant Reformation?", options:["John Calvin","Martin Luther","Henry VIII","Thomas More"], answer:1},
+{q:"The Industrial Revolution began in which country?", options:["France","Germany","England","United States"], answer:2},
+{q:"Who was the leader of the Soviet Union during World War II?", options:["Vladimir Lenin","Joseph Stalin","Nikita Khrushchev","Leon Trotsky"], answer:1},
+{q:"Which ancient civilization built the pyramids of Giza?", options:["Mesopotamians","Egyptians","Greeks","Romans"], answer:1},
+{q:"The Magna Carta limited the power of which monarch?", options:["King John of England","Henry VIII","Louis XIV","Charles I"], answer:0},
+{q:"Who discovered America in 1492?", options:["Ferdinand Magellan","Marco Polo","Christopher Columbus","Vasco da Gama"], answer:2},
+{q:"The Berlin Wall fell in which year?", options:["1989","1975","1991","1961"], answer:0}
+];
+
+const quizForm = document.getElementById("quizForm");
+
+questions.forEach((item, index) => {
+    let html = `<div>
+        <p class="font-semibold">${index + 1}. ${item.q}</p>`;
+    item.options.forEach((opt, i) => {
+        html += `
+        <label class="block">
+            <input type="radio" name="q${index}" value="${i}">
+            ${opt}
+        </label>`;
+    });
+    html += `</div>`;
+    quizForm.innerHTML += html;
+});
+
+function submitQuiz(){
+    const student = document.getElementById("student").value;
+    const teacher = document.getElementById("teacher").value;
+    const subject = document.getElementById("subject").value;
+
+    if(!student || !teacher || !subject){
+        alert("Please fill in all information fields.");
+        return;
+    }
+
+    let score = 0;
+    let review = "";
+
+    questions.forEach((item, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        if(selected && parseInt(selected.value) === item.answer){
+            score++;
+            review += `<p class="text-green-600">✔ Q${index+1} Correct</p>`;
+        } else {
+            review += `<p class="text-red-600">✘ Q${index+1} Incorrect (Correct: ${item.options[item.answer]})</p>`;
+        }
+    });
+
+    const percentage = ((score / questions.length) * 100).toFixed(2);
+
+    const resultData = {
+        student, teacher, subject, score, percentage, date: new Date().toLocaleString()
+    };
+
+    localStorage.setItem("quizResult", JSON.stringify(resultData));
+
+    document.getElementById("result").classList.remove("hidden");
+    document.getElementById("result").innerHTML = `
+        <h2 class="text-xl font-bold mb-2">Result</h2>
+        <p><strong>Student:</strong> ${student}</p>
+        <p><strong>Teacher:</strong> ${teacher}</p>
+        <p><strong>Subject:</strong> ${subject}</p>
+        <p class="mt-2"><strong>Score:</strong> ${score}/10</p>
+        <p><strong>Percentage:</strong> ${percentage}%</p>
+        <hr class="my-2">
+        ${review}
+    `;
+}
+</script>
+
+</body>
+</html>
